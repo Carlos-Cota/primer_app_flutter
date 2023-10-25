@@ -2,6 +2,10 @@
 
 A new Flutter project.
 
+Este es el codigo de mi primera App para mflutter 
+Author: Carlos Cota
+
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
