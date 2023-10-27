@@ -41,16 +41,42 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     return Scaffold(
-      body: Column(
-        children: [
-          Text("Idea aleatoria"),
-          Text(appState.current.asLowerCase),
-          ElevatedButton(
-            onPressed: (){
-              appState.getSiguiente();
-            },
-             child: Text("Siguiente"))
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(idea: appState.current),
+            SizedBox(height: 10),
+            ElevatedButton(
+                onPressed: () {
+                  appState.getSiguiente();
+                },
+                child: Text("Siguiente"))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  final WordPair idea;
+  const BigCard({super.key, required this.idea});
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final textStyle = tema.textTheme.displayMedium!
+        .copyWith(color: tema.colorScheme.onPrimary);
+    return Card(
+      color: tema.primaryColor,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          idea.asLowerCase,
+          style: textStyle,
+          semanticsLabel: "${idea.first} ${idea.second}",
+        ),
       ),
     );
   }
