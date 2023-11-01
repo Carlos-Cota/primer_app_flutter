@@ -44,35 +44,55 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
 
+class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Row(
-      children: [
-        SafeArea(
-            child: NavigationRail(
-          extended: false,
-          destinations: const [
-            NavigationRailDestination(
-                icon: Icon(Icons.home), label: Text("Inicio")),
-            NavigationRailDestination(
-                icon: Icon(Icons.favorite), label: Text("Favoritos"))
-          ],
-          selectedIndex: 0,
-          onDestinationSelected: (value) {
-            print("Selección: $value");
-          },
-        )),
-        Expanded(
-            child: Container(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          child: GeneratorPage(),
-        ))
-      ],
-    ));
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = FavoritosPage();
+        break;
+      default:
+        throw UnimplementedError('No hay un widget para: $selectedIndex');
+    }
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+          body: Row(
+        children: [
+          SafeArea(
+              child: NavigationRail(
+            extended: constraints.maxWidth >= 600,
+            destinations: const [
+              NavigationRailDestination(
+                  icon: Icon(Icons.home), label: Text("Inicio")),
+              NavigationRailDestination(
+                  icon: Icon(Icons.favorite), label: Text("Favoritos")),
+            ],
+            selectedIndex: 0,
+            onDestinationSelected: (value) {
+              setState(() {
+                (selectedIndex = value);
+              });
+            },
+          )),
+          Expanded(
+              child: Container(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: page,
+          ))
+        ],
+      ));
+    });
   }
 }
 
@@ -135,6 +155,32 @@ class GeneratorPage extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class FavoritosPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    if (appState.favoritos.isEmpty) {
+      return Center(
+        child: Text("Aún no hay favoritos"),
+      );
+    }
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child:
+              Text('se han elegido' '${appState.favoritos.length} favoritos'),
+        ),
+        for (var name in appState.favoritos)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(name.asLowerCase),
+          )
+      ],
     );
   }
 }
